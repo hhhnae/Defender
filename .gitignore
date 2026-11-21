@@ -1,0 +1,15 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Export / build output
+/build/
+*.exe
+*.pck
+
+# Local tooling and temporary artifacts
+.tmpexport/
+.protected/
+.acl-recovery/
+.team_create/
+*.log
