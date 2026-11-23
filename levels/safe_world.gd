@@ -18,8 +18,9 @@ const ROOM := Vector2(1280.0, 720.0)
 const FLOOR_Y := 600.0
 const PORTAL_CENTER := Vector2(1010.0, 468.0)
 const PORTAL_ANCHOR := Vector2(1010.0, 600.0)
-## 回到安全区时的传送入场演出时长
-const ARRIVAL_TIME := 1.15
+## 首次进主城的入场位置(画面外左侧)与回城位置(传送门)
+const FIRST_SPAWN := Vector2(-30.0, 600.0)
+const RETURN_SPAWN := Vector2(1005.0, 600.0)
 
 const C_CYAN := Color("#5fe4ff")
 const C_CYAN_DIM := Color("#2d7f9e")
@@ -78,8 +79,13 @@ func _ready() -> void:
 	_fx.draw.connect(_draw_fx)
 	_rng_motes()
 	_build_ui()
+	var first_time := not bool(Engine.get_meta("safe_world_entered", false))
+	Engine.set_meta("safe_world_entered", true)
+	if _player != null:
+		_player.global_position = FIRST_SPAWN if first_time else RETURN_SPAWN
 	_arrive()
-	_play_entrance()
+	if first_time:
+		_play_entrance()
 
 
 func _rng_motes() -> void:
