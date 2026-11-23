@@ -7,17 +7,17 @@ const MUSIC_TARGET_DB := -14.0
 const MUSIC_DUCK_DB := -26.0
 
 const LINES := [
-	"喂喂——能听到吗？[color=#8fe9ff]系统管理员[/color]！我是你的专属辅助者[color=#8fe9ff]鲸鱼娘[/color]，现在整条应急频道就剩你和我了！",
-	"别愣着啦——有不明 [color=#ff6b8a]病毒[/color] 突破了外层防火墙，正在往系统内核里钻！",
-	"核心数据就锁在内核最深处，一旦被它们啃穿，整个系统都会跟着一起崩掉。",
-	"我现在被堵在数据舱这一侧，你先赶过来跟我汇合，我们一起把核心数据守住。",
-	"路上那些被感染的进程不会乖乖让路，边打边清，一步都别让病毒靠近核心。",
-	"准备好了吗？——3、2、1！[color=#ff6b8a]核心守护行动[/color]，开始！",
+	"喂喂——能听到吗？[color=#8fe9ff]系统管理员[/color]。我是[color=#8fe9ff]鲸鱼娘[/color]，07 号[color=#8fe9ff]守望节点[/color]的值守员。这条应急频道，我已经守了七十二天。",
+	"守望节点是全网最后一座灯塔——只要它还亮着，被占领的网络就还有被找回来的可能。",
+	"你脚下的[color=#8fe9ff]安全区[/color]，是唯一没被攻陷的服务器。也是我替你守着、一直没让出去的地方。",
+	"维护方式换了新的：不再隔着防火墙打补丁，而是把管理员直接投进数据层，用手把坏掉的地方一寸寸修回来。",
+	"第一次上线测试那天，[color=#ff6b8a]不明入侵者[/color]顺着维护通道反向钻了进来，把整片网络占成了它的地盘，主世界的节点全部失守。",
+	"我留在这里守着，就为了等你回来——把它[color=#ff6b8a]夺回[/color]。准备好了吗？右侧[color=#8fe9ff]传送门[/color]直达 MAIN_WORLD——3、2、1，[color=#ff6b8a]守望反攻[/color]，开始！",
 ]
 
 ## 自定义简报：留空时使用开场六句；最终战简报只覆盖一句。
 @export var custom_lines: PackedStringArray = []
-@export var next_scene := "res://levels/game.tscn"
+@export var next_scene := "res://levels/safe_world.tscn"
 ## 语音资源已删除,默认关闭;以后要加语音把这里改回 true 并放回 intro_01..06.wav。
 @export var voice_enabled := false
 ## 语音资源已全部移除;留空时按 intro_01..06.wav 探测,文件不存在就静音。
@@ -34,8 +34,8 @@ const LINES := [
 @export var stay_in_scene := false
 
 signal finished
-@export var loading_text := "> 正在进入游戏世界…"
-@export var header_tag := "// PRE-MISSION BRIEFING"
+@export var loading_text := "> 正在接入安全区…"
+@export var header_tag := "// WATCH_NODE_BRIEFING"
 
 @onready var portrait: TextureRect = %Portrait
 @onready var portrait_glow: TextureRect = %PortraitGlow

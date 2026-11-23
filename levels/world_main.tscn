@@ -458,13 +458,6 @@ position = Vector2(8000, 656)
 [node name="TrainingDummy_11150" parent="." instance=ExtResource("8_dummy")]
 position = Vector2(11150, 656)
 
-[node name="VioletCompanion" parent="." instance=ExtResource("9_npc")]
-position = Vector2(3050, 606)
-art = "girl"
-
-[node name="Tutorial" type="Node2D" parent="VioletCompanion"]
-script = ExtResource("16_tutorial")
-
 [node name="Enemy_1050" parent="." instance=ExtResource("12_enemy")]
 position = Vector2(1050, 656)
 

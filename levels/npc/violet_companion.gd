@@ -46,6 +46,8 @@ const REACTIONS := [
 @export var follow_offset := Vector2(84.0, 74.0)
 ## 为 true 时不经"按攻击键缔结"直接进入同行状态(用于直接以同行者身份出场的场景)。
 @export var start_following := false
+## 安全区主城形态:还没跟随时也能按 F 交互,菜单里可切换「跟随我 / 留下」。
+@export var hub_mode := false
 @export var max_health := 300
 @export var fire_interval := 2.2
 @export var attack_range := 760.0
@@ -188,6 +190,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		_idle()
 		velocity.x = 0.0
+		if hub_mode:
+			if Input.is_action_just_pressed("interact"):
+				_try_interact()
+			_update_follow_prompt()
 	_apply_ground(delta)
 
 
@@ -214,6 +220,8 @@ func _try_interact() -> void:
 	_face(_player.global_position.x - global_position.x)
 	_prompt.visible = false
 	if _menu != null:
+		if _menu.has_method("set_follow_option"):
+			_menu.call("set_follow_option", hub_mode, _following)
 		_menu.call("open", self)
 		return
 	_play_reaction()
@@ -552,6 +560,10 @@ func _idle() -> void:
 	if not _ensure_player():
 		return
 	var distance := global_position.distance_to(_player.global_position)
+	if hub_mode:
+		# 主城里不自动缔结同行:只转向玩家,是否跟随交给 F 交互菜单。
+		_face(_player.global_position.x - global_position.x)
+		return
 	_prompt.visible = distance < 240.0
 	if _prompt.visible:
 		_prompt.text = "自动同行"

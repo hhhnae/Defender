@@ -58,6 +58,11 @@ func _physics_process(delta: float) -> void:
 	var player := get_parent() as Node2D
 	if player == null:
 		return
+	# 基础战斗形态:U 回复 / I 混沌爆炎关闭;Q 假死保留,但要在整备终端装备了「假死」。
+	if bool(player.get("basic_loadout")):
+		if Input.is_action_just_pressed("skill_3") and _loadout_has_skill("skill_feign"):
+			_cast_feign(player)
+		return
 	if bool(player.get("_won")) or bool(player.get("_walk_in_active")):
 		return
 	if int(player.get("health")) <= 0:
@@ -71,6 +76,14 @@ func _physics_process(delta: float) -> void:
 
 
 ## 技能基础数值按「加强技能」倍率放大。
+## 整备终端里是否装备了某个技能。
+func _loadout_has_skill(id: String) -> bool:
+	var lo := get_node_or_null("/root/Loadout")
+	if lo == null:
+		return false
+	return bool(lo.call("has_skill", id))
+
+
 func _scaled(base: int) -> int:
 	return maxi(1, int(round(float(base) * PlayerStats.skill_scale())))
 

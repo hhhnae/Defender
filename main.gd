@@ -90,7 +90,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_start_pressed() -> void:
 	# 新开一局:让第一个房间的黑屏闪动演出重新播一次。
 	Engine.set_meta("world_crisis_played", false)
-	# 先进入黑幕 gal 简报，再由简报进入关卡（world_main）。
+	Engine.set_meta("freshman_done", false)
+	# 先进入黑幕 gal 简报，再由简报进入安全区主城（safe_world），
+	# 主城里的传送门再送玩家进入 main_world（levels/game.tscn）。
 	var packed := load(INTRO_SCENE) as PackedScene
 	if packed == null:
 		packed = load(GAME_SCENE) as PackedScene
