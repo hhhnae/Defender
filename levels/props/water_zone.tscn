@@ -1,0 +1,11 @@
+﻿[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://levels/props/water_zone.gd" id="1_wz"]
+
+[sub_resource type="RectangleShape2D" id="Rect"]
+
+[node name="WaterZone" type="Area2D"]
+script = ExtResource("1_wz")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Rect")

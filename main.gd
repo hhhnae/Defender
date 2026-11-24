@@ -92,6 +92,12 @@ func _on_start_pressed() -> void:
 	Engine.set_meta("world_crisis_played", false)
 	Engine.set_meta("freshman_done", false)
 	Engine.set_meta("safe_world_entered", false)
+	var pg := get_node_or_null("/root/Plugins")
+	if pg != null:
+		pg.call("reset")
+	var wm := get_node_or_null("/root/WorldMap")
+	if wm != null:
+		wm.call("reset")
 	# 先进入黑幕 gal 简报，再由简报进入安全区主城（safe_world），
 	# 主城里的传送门再送玩家进入 main_world（levels/game.tscn）。
 	var packed := load(INTRO_SCENE) as PackedScene

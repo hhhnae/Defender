@@ -32,7 +32,7 @@ const DEFAULT_SKILL := {
 	"name": "假死",
 	"kind": "skill",
 	"tag": "Q",
-	"desc": "装死，古老而有效的方法；按下攻击退出假死状态。冷却 8 秒。",
+	"desc": "装死，古老而有效的方法；一直保持到下一次攻击。冷却 10 秒。",
 	"icon": "res://levels/ui/icons/skill_feign.png",
 }
 
@@ -168,6 +168,15 @@ func _remove_from_slots(item: Dictionary) -> void:
 ## 指定 id 的技能是否正装在某个技能槽里。
 func has_skill(id: String) -> bool:
 	for cur in skills:
+		var d: Dictionary = cur
+		if not d.is_empty() and String(d.get("id", "")) == id:
+			return true
+	return false
+
+
+## 指定 id 的终极技能/插件是否装在终极槽里。
+func has_ultimate(id: String) -> bool:
+	for cur in ultimate:
 		var d: Dictionary = cur
 		if not d.is_empty() and String(d.get("id", "")) == id:
 			return true

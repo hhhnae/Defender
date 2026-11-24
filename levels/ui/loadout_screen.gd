@@ -151,7 +151,7 @@ func _refresh_owned() -> void:
 		_owned_box.remove_child(child)
 		child.queue_free()
 	var count := Loadout.owned.size()
-	_owned_title.text = "已有技能  (%d)" % count
+	_owned_title.text = "已有物品  (%d)" % count
 	if count == 0:
 		var wrap := CenterContainer.new()
 		wrap.custom_minimum_size = Vector2(0, 260)
@@ -161,7 +161,7 @@ func _refresh_owned() -> void:
 		v.add_theme_constant_override("separation", 8)
 		wrap.add_child(v)
 		var empty := Label.new()
-		empty.text = "尚未获得任何技能"
+		empty.text = "尚未获得任何物品"
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty.add_theme_font_override("font", _font_bold)
 		empty.add_theme_font_size_override("font_size", 20)
@@ -435,7 +435,7 @@ func _build() -> void:
 	right.add_theme_constant_override("separation", 8)
 	body.add_child(right)
 
-	_owned_title = _section_label("已有技能  (0)")
+	_owned_title = _section_label("已有物品  (0)")
 	right.add_child(_owned_title)
 
 	var scroll := ScrollContainer.new()
@@ -447,6 +447,7 @@ func _build() -> void:
 	_owned_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_owned_box.add_theme_constant_override("separation", 8)
 	scroll.add_child(_owned_box)
+
 
 	# 底部提示
 	var footer := HBoxContainer.new()

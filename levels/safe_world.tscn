@@ -44,6 +44,9 @@ collision_mask = 0
 position = Vector2(1292, 300)
 shape = SubResource("RectWall")
 
+[node name="Terminal" type="Node2D" parent="."]
+z_index = -10
+
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(-30, 600)
 camera_limits = Rect2(0, 0, 1280, 720)

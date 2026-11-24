@@ -33,6 +33,7 @@ const FINAL_DEFEAT := BOSS_REVIVES + 1
 const TOKENS_PER_PHASE := [200, 400, 800, 1200, 1600]
 ## 死亡后退回的第一房间
 const FIRST_ROOM := "res://levels/game.tscn"
+const SAFE_WORLD := "res://levels/safe_world.tscn"
 
 @onready var _player: Node2D = $Player
 @onready var _npc: Node2D = $WizardBoss
@@ -204,7 +205,7 @@ func _on_player_died() -> void:
 		var tw := create_tween()
 		tw.tween_property(_fade, "color:a", 1.0, 0.9)
 		await get_tree().create_timer(1.0).timeout
-	get_tree().change_scene_to_file(FIRST_ROOM)
+	get_tree().change_scene_to_file(SAFE_WORLD)
 
 
 ## 背景切换演出:模糊 → 画面震动 → 全黑 → 换图 → 淡出黑场,共 2 秒。

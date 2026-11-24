@@ -1,0 +1,18 @@
+﻿[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://levels/world_edge_big.gd" id="1_big"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://levels/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://levels/goal/extraction.tscn" id="4_exit"]
+
+[node name="WorldEdgeBig" type="Node2D"]
+script = ExtResource("1_big")
+
+[node name="Extraction" parent="." instance=ExtResource("4_exit")]
+position = Vector2(4550, 900)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(650, 1965)
+camera_limits = Rect2(0, 0, 5120, 2880)
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]

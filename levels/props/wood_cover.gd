@@ -2,6 +2,9 @@ extends StaticBody2D
 ## 木质掩体:可被主角攻击破坏。
 
 const HIT_SPARK := preload("res://player/character/effect/hit_spark.tscn")
+const TOKEN_DROP := preload("res://levels/combat/token_drop.gd")
+## 砸碎后掉落的 token 数量
+const DROP_TOKENS := 3
 
 @export var max_hp := 24
 
@@ -50,4 +53,5 @@ func _break() -> void:
 		host = host.get_parent()
 	if host != null:
 		host.add_child.call_deferred(spark)
+		TOKEN_DROP.burst(host, global_position + Vector2(0.0, -36.0), DROP_TOKENS)
 	queue_free()

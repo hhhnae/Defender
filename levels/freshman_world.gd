@@ -1,6 +1,6 @@
 extends Node2D
 
-## FRESHMAN_WORLD —— 新手训练舱:按顺序教会移动 / 跳跃 / 攻击 / 闪避 / 技能(Q 假死) / 离开。
+## FRESHMAN_WORLD —— 教程关卡:按顺序教会移动 / 跳跃 / 攻击 / 闪避 / 技能(Q 假死) / 离开。
 
 const SAFE_WORLD := "res://levels/safe_world.tscn"
 const UI_FONT := preload("res://levels/ui/ui_font.gd")
@@ -65,7 +65,7 @@ func _ready() -> void:
 	var tw := create_tween()
 	tw.tween_property(_fade, "color:a", 0.0, 0.35)
 	_refresh_ui()
-	# 从最左端走进训练舱
+	# 从最左端走进教程
 	if _player != null and _player.has_method("begin_walk_in"):
 		_player.call("begin_walk_in", 150.0, 150.0)
 
@@ -276,7 +276,7 @@ func _draw_room() -> void:
 	# 墙面标识
 	d.draw_string(_font_bold, Vector2(70.0, 132.0), "FRESHMAN_WORLD",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 44, Color(C_CYAN, 0.13))
-	d.draw_string(_font, Vector2(74.0, 166.0), "// 训练舱 · 基础操作",
+	d.draw_string(_font, Vector2(74.0, 166.0), "// 教程 · 基础操作",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(C_CYAN, 0.22))
 
 	# 地面

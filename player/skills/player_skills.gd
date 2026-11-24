@@ -26,7 +26,7 @@ const TORNADO_COOLDOWN := 30.0
 
 ## 假死:Q 键,冷却 8 秒;倒地姿态、免疫伤害,按任意攻击键起身
 const FEIGN_LINE := "啊，我死啦"
-const FEIGN_COOLDOWN := 8.0
+const FEIGN_COOLDOWN := 10.0
 
 ## 闪现:向面向瞬移火雨房间宽度的一半,空中也能用,不会穿过场地两侧;
 ## 每次消耗 10 token,瞬移期间无敌,无冷却
@@ -288,6 +288,9 @@ func _cast_feign(player: Node2D) -> void:
 		if pistol != null and bool(pistol):
 			return
 	_feign_cd = _cd(FEIGN_COOLDOWN)
+	var ab := get_node_or_null("/root/Abilities")
+	if ab != null:
+		ab.call("set_cooldown", "skill_feign", _feign_cd)
 	player.call("feign_death")
 	_show_subtitle(player.global_position + Vector2(0.0, -152.0), FEIGN_LINE)
 

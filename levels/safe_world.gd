@@ -13,6 +13,7 @@ const SCANLINES := preload("res://shaders/scanlines.gdshader")
 const LOADOUT_SCREEN := preload("res://levels/ui/loadout_screen.tscn")
 const INTRO_SCENE := preload("res://intro.tscn")
 const FRESHMAN_SCENE := "res://levels/freshman_world.tscn"
+const WORLD_SELECT := preload("res://levels/ui/world_select.tscn")
 
 const ROOM := Vector2(1280.0, 720.0)
 const FLOOR_Y := 600.0
@@ -38,6 +39,7 @@ const C_METAL := Color("#16202f")
 
 @onready var _backdrop: Node2D = $Backdrop
 @onready var _portal: Node2D = $Portal
+@onready var _terminal: Node2D = $Terminal
 @onready var _fx: Node2D = $Fx
 @onready var _player: CharacterBody2D = $Player
 
@@ -49,6 +51,9 @@ var _prompt_label: Label
 var _toast_label: Label
 var _fade: ColorRect
 var _loadout_ui: CanvasLayer
+var _world_select: CanvasLayer
+var _icon_style: Texture2D
+var _icon_skill: Texture2D
 var _ui_font: Font
 var _ui_font_bold: Font
 var _motes: Array[Vector3] = []
@@ -59,13 +64,13 @@ var _spots: Array[Dictionary] = [
 	{
 		"pos": PORTAL_ANCHOR,
 		"range": 165.0,
-		"label": "[ F ]  进入 MAIN_WORLD",
+		"label": "[ F ]  维度通道 · 选择地图",
 		"kind": &"portal",
 	},
 	{
 		"pos": Vector2(330.0, 600.0),
 		"range": 95.0,
-		"label": "[ F ]  查看整备终端",
+		"label": "[ F ]  整备终端 · 装备与技能",
 		"kind": &"terminal",
 	},
 ]
@@ -76,7 +81,10 @@ func _ready() -> void:
 	_ui_font_bold = UI_FONT.make(true)
 	_backdrop.draw.connect(_draw_backdrop)
 	_portal.draw.connect(_draw_portal)
+	_terminal.draw.connect(_draw_terminal)
 	_fx.draw.connect(_draw_fx)
+	_icon_style = _load_texture("res://levels/ui/icons/style_basic_melee.png")
+	_icon_skill = _load_texture("res://levels/ui/icons/skill_feign.png")
 	_rng_motes()
 	_build_ui()
 	var first_time := not bool(Engine.get_meta("safe_world_entered", false))
@@ -101,6 +109,7 @@ func _rng_motes() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	_portal.queue_redraw()
+	_terminal.queue_redraw()
 	_fx.queue_redraw()
 	_update_prompt(delta)
 	if not _entering and Input.is_action_just_pressed("interact"):
@@ -141,11 +150,7 @@ func _activate_spot() -> void:
 		return
 	var kind: StringName = _spots[_active_spot]["kind"]
 	if kind == &"portal":
-		# 第一次用传送门:先播一段对话,再把人送进新手训练舱。
-		if bool(Engine.get_meta("freshman_done", false)):
-			_enter_main_world()
-		else:
-			_play_freshman_intro()
+		_open_world_select()
 	else:
 		_open_loadout()
 
@@ -170,7 +175,50 @@ func _enter_main_world() -> void:
 	get_tree().change_scene_to_file(GAME_SCENE)
 
 
-## 首次传送:鲸鱼娘交代一句,然后进训练舱。
+## 传送门交互:打开维度通道,选择要去的地图。
+func _open_world_select() -> void:
+	if _entering:
+		return
+	if _world_select == null:
+		_world_select = WORLD_SELECT.instantiate() as CanvasLayer
+		add_child(_world_select)
+		_world_select.connect("entered", _on_world_selected)
+	var prefer := "world_01"
+	if not bool(Engine.get_meta("freshman_done", false)):
+		prefer = "freshman"
+	if _world_select != null and _world_select.has_method("open"):
+		_world_select.call("open", prefer)
+
+
+## 选好地图:教程第一次进要播对话,其余直接切场景。
+func _on_world_selected(id: String) -> void:
+	var entry: Dictionary = WorldMap.get_entry(id)
+	if entry.is_empty():
+		return
+	var scene := String(entry.get("scene", ""))
+	if scene.is_empty():
+		return
+	if id == "freshman" and not bool(Engine.get_meta("freshman_done", false)):
+		_play_freshman_intro()
+		return
+	_enter_scene(scene)
+
+
+## 淡出并切换场景。
+func _enter_scene(path: String) -> void:
+	if _entering:
+		return
+	_entering = true
+	if _player != null:
+		_player.set_physics_process(false)
+	_prompt_label.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_fade, "color:a", 1.0, 0.4)
+	await tw.finished
+	get_tree().change_scene_to_file(path)
+
+
+## 首次进入教程:鲸鱼娘交代一句,然后切场景。
 func _play_freshman_intro() -> void:
 	if _entering:
 		return
@@ -184,12 +232,12 @@ func _play_freshman_intro() -> void:
 	var intro := INTRO_SCENE.instantiate()
 	intro.set("custom_lines", PackedStringArray([
 		"先来熟悉一下基础操作吧。",
-		"训练舱的入口我给你打开了——移动、跳跃、攻击、闪避、技能，一样一样来。",
+		"教程的入口我给你打开了——移动、跳跃、攻击、闪避、技能，一样一样来。",
 		"学完从出口回来，我在这儿等你。",
 	]))
 	intro.set("stay_in_scene", true)
 	intro.set("header_tag", "// FRESHMAN PROGRAM")
-	intro.set("loading_text", "> 正在打开训练舱…")
+	intro.set("loading_text", "> 正在打开教程…")
 	layer.add_child(intro)
 	await intro.finished
 	layer.queue_free()
@@ -501,31 +549,119 @@ func _draw_screens() -> void:
 		pts.append(Vector2(px, py))
 	d.draw_polyline(pts, Color(C_CYAN, 0.85), 2.0)
 
-	# 左侧整备终端:悬空全息板 + 落地控制台
-	var p := Rect2(206.0, 300.0, 200.0, 112.0)
-	d.draw_rect(Rect2(p.position - Vector2(5, 5), p.size + Vector2(10, 10)), Color(C_VIOLET, 0.05))
-	d.draw_rect(p, Color("#080f1c"))
-	d.draw_rect(p, Color(C_VIOLET, 0.45), false, 1.0)
-	d.draw_string(_ui_font_bold, p.position + Vector2(12.0, 24.0), "LOADOUT",
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(C_VIOLET, 0.9))
-	for i in 4:
-		var y := p.position.y + 40.0 + float(i) * 15.0
-		d.draw_rect(Rect2(p.position.x + 12.0, y, 88.0, 3.0), Color(0.6, 0.7, 0.8, 0.22))
-		d.draw_rect(Rect2(p.position.x + 108.0, y, 80.0, 3.0), Color(C_VIOLET, 0.35))
-	# 全息板与终端之间的微光
-	d.draw_line(Vector2(306.0, 412.0), Vector2(306.0, 538.0), Color(C_VIOLET, 0.10), 2.0)
 
-	# 控制台本体
-	d.draw_rect(Rect2(276.0, 546.0, 108.0, 54.0), Color("#0b1420"))
-	d.draw_rect(Rect2(276.0, 546.0, 108.0, 54.0), Color(C_EDGE, 0.9), false, 1.0)
-	d.draw_rect(Rect2(284.0, 554.0, 92.0, 26.0), Color("#08161f"))
+
+
+# ---------------------------------------------------------------- 整备终端
+
+## 优先走导入资源;还没导入时直接读 PNG。
+func _load_texture(path: String) -> Texture2D:
+	if ResourceLoader.exists(path):
+		var tex := load(path) as Texture2D
+		if tex != null:
+			return tex
+	var img := Image.new()
+	if img.load(path) == OK:
+		return ImageTexture.create_from_image(img)
+	return null
+
+
+## 动态整备终端:底座光环 + 控制台 + 悬浮全息屏(带图标和滚动扫描线)。
+func _draw_terminal() -> void:
+	var d := _terminal
+	var cx := 330.0
+	var near := _player != null and absf(_player.global_position.x - cx) < 140.0
+	var boost := 1.0
+	if near:
+		boost = 1.35 + 0.15 * sin(_t * 4.0)
+	var bob := sin(_t * 1.6) * 2.5
+
+	# 地面光环(旋转虚线)
+	d.draw_set_transform(Vector2(cx, FLOOR_Y - 2.0), 0.0, Vector2(1.0, 0.26))
 	for i in 4:
-		var sy := 558.0 + float(i) * 6.0
-		d.draw_rect(Rect2(288.0, sy, 84.0, 2.0), Color(C_CYAN, 0.22))
-	d.draw_rect(Rect2(284.0, 586.0, 92.0, 8.0), Color("#0d1a29"))
-	d.draw_rect(Rect2(284.0, 586.0, 92.0, 2.0), Color(C_VIOLET, 0.7))
-	d.draw_rect(Rect2(270.0, FLOOR_Y - 5.0, 120.0, 5.0), Color(C_VIOLET, 0.28))
-	d.draw_rect(Rect2(282.0, FLOOR_Y - 2.0, 96.0, 3.0), Color(C_VIOLET, 0.55))
+		d.draw_circle(Vector2.ZERO, 104.0 - float(i) * 18.0, Color(C_VIOLET, 0.03 * boost))
+	for i in 18:
+		var a0 := _t * 0.5 + TAU * float(i) / 18.0
+		d.draw_arc(Vector2.ZERO, 92.0, a0, a0 + 0.14, 5,
+			Color(C_VIOLET, minf(0.9, 0.45 * boost)), 3.0)
+	for i in 12:
+		var a0 := -_t * 0.8 + TAU * float(i) / 12.0
+		d.draw_arc(Vector2.ZERO, 62.0, a0, a0 + 0.18, 5,
+			Color(C_CYAN, minf(0.9, 0.4 * boost)), 2.0)
+	d.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+	# 光柱
+	d.draw_rect(Rect2(cx - 34.0, 470.0, 68.0, FLOOR_Y - 470.0), Color(C_VIOLET, 0.035 * boost))
+	d.draw_rect(Rect2(cx - 10.0, 470.0, 20.0, FLOOR_Y - 470.0), Color(C_VIOLET, 0.07 * boost))
+
+	# 控制台
+	d.draw_rect(Rect2(cx - 44.0, 552.0, 88.0, 48.0), Color("#0c1524"))
+	d.draw_rect(Rect2(cx - 44.0, 552.0, 88.0, 48.0), Color(C_EDGE, 1.0), false, 1.0)
+	d.draw_rect(Rect2(cx - 36.0, 558.0, 72.0, 24.0), Color("#08161f"))
+	for i in 4:
+		var sy := 561.0 + float(i) * 5.0
+		d.draw_rect(Rect2(cx - 32.0, sy, 64.0, 2.0), Color(C_CYAN, 0.25 + 0.1 * sin(_t * 3.0 + float(i))))
+	d.draw_rect(Rect2(cx - 36.0, 586.0, 72.0, 6.0), Color("#0d1a29"))
+	d.draw_rect(Rect2(cx - 36.0, 586.0, 72.0, 2.0), Color(C_VIOLET, minf(1.0, 0.7 * boost)))
+
+	# 悬浮全息屏
+	var panel := Rect2(cx - 116.0, 322.0 + bob, 232.0, 136.0)
+	d.draw_rect(Rect2(panel.position - Vector2(8, 8), panel.size + Vector2(16, 16)),
+		Color(C_VIOLET, 0.05 * boost))
+	d.draw_rect(panel, Color(0.03, 0.05, 0.10, 0.92))
+	d.draw_rect(panel, Color(C_VIOLET, minf(1.0, 0.55 * boost)), false, 1.5)
+	# 四角高亮
+	for corner in [panel.position, Vector2(panel.end.x, panel.position.y),
+			panel.end, Vector2(panel.position.x, panel.end.y)]:
+		d.draw_circle(corner, 2.0, Color(C_VIOLET, 0.8 * boost))
+
+	# 标题
+	d.draw_string(_ui_font_bold, panel.position + Vector2(12.0, 24.0), "整备终端",
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color(0.82, 0.72, 1.0, 0.95))
+	d.draw_string(_ui_font, panel.position + Vector2(96.0, 23.0), "LOADOUT TERMINAL",
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(C_VIOLET, 0.7))
+	d.draw_line(panel.position + Vector2(12.0, 32.0), Vector2(panel.end.x - 12.0, panel.position.y + 32.0),
+		Color(C_VIOLET, 0.35), 1.0)
+
+	# 两个图标:战斗风格 / 技能
+	var icon_y := panel.position.y + 44.0
+	if _icon_style != null:
+		d.draw_texture_rect(_icon_style, Rect2(panel.position.x + 14.0, icon_y, 48.0, 48.0), false)
+	if _icon_skill != null:
+		d.draw_texture_rect(_icon_skill, Rect2(panel.position.x + 70.0, icon_y, 48.0, 48.0), false)
+	d.draw_string(_ui_font, Vector2(panel.position.x + 14.0, icon_y + 62.0), "风格",
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(C_AMBER, 0.85))
+	d.draw_string(_ui_font, Vector2(panel.position.x + 70.0, icon_y + 62.0), "技能",
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(C_CYAN, 0.85))
+
+	# 右侧数据条
+	for i in 5:
+		var y := panel.position.y + 46.0 + float(i) * 13.0
+		var w := 60.0 + 34.0 * (0.5 + 0.5 * sin(_t * 1.8 + float(i) * 0.9))
+		d.draw_rect(Rect2(panel.position.x + 132.0, y, 74.0, 4.0), Color(0.5, 0.6, 0.8, 0.18))
+		d.draw_rect(Rect2(panel.position.x + 132.0, y, w, 4.0), Color(C_VIOLET, 0.55 * boost))
+
+	# 滚动扫描线
+	var scan_y := panel.position.y + fmod(_t * 62.0, panel.size.y)
+	d.draw_rect(Rect2(panel.position.x + 2.0, scan_y, panel.size.x - 4.0, 3.0),
+		Color(0.7, 0.9, 1.0, 0.10 * boost))
+
+	# 悬浮环
+	d.draw_arc(Vector2(cx, panel.position.y + panel.size.y * 0.5 + bob), 150.0,
+		_t * 0.6, _t * 0.6 + 2.0, 24, Color(C_VIOLET, 0.25 * boost), 2.0)
+	d.draw_arc(Vector2(cx, panel.position.y + panel.size.y * 0.5 + bob), 150.0,
+		-_t * 0.45 + 3.6, -_t * 0.45 + 5.2, 24, Color(C_CYAN, 0.22 * boost), 2.0)
+
+	# 上升粒子
+	for i in 16:
+		var ph := fmod(_t * 0.35 + float(i) * 0.19, 1.0)
+		var px := cx + sin(float(i) * 2.3 + _t) * 52.0
+		var py := FLOOR_Y - 20.0 - ph * 210.0
+		d.draw_rect(Rect2(px, py, 2.0, 5.0), Color(0.8, 0.7, 1.0, (1.0 - ph) * 0.35 * boost))
+
+	# 顶部指引
+	d.draw_string(_ui_font_bold, Vector2(cx - 42.0, panel.position.y - 16.0), "◆ 整备",
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(C_VIOLET, minf(1.0, 0.6 * boost)))
 
 
 func _draw_floor() -> void:

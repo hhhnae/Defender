@@ -1,0 +1,242 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://levels/world_edge.gd" id="1_edge"]
+[ext_resource type="PackedScene" path="res://levels/terrain/forest_platform.tscn" id="2_plat"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://levels/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://levels/goal/extraction.tscn" id="5_exit"]
+[ext_resource type="PackedScene" path="res://levels/props/climb_zone.tscn" id="6_climb"]
+[ext_resource type="PackedScene" path="res://levels/props/spike_trap.tscn" id="7_spike"]
+[ext_resource type="Texture2D" path="res://levels/forest/forest_map.png" id="8_bg"]
+[ext_resource type="PackedScene" path="res://levels/props/water_zone.tscn" id="10_water"]
+[ext_resource type="PackedScene" path="res://levels/props/treasure_chest.tscn" id="11_chest"]
+[ext_resource type="Shader" path="res://shaders/scanlines.gdshader" id="9_scan"]
+
+[sub_resource type="ShaderMaterial" id="MatScan"]
+shader = ExtResource("9_scan")
+shader_parameter/line_density = 0.16
+shader_parameter/vignette_strength = 0.5
+
+[node name="WorldEdge" type="Node2D"]
+script = ExtResource("1_edge")
+
+[node name="Backdrop" type="Sprite2D" parent="."]
+z_index = -100
+texture_filter = 1
+position = Vector2(1280, 720)
+scale = Vector2(1.3333, 1.3333)
+texture = ExtResource("8_bg")
+
+[node name="Terrain" type="Node2D" parent="."]
+
+[node name="Branch1" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(568.0, 786.7)
+size = Vector2(176.0, 32.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Branch2" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1154.65, 770.7)
+size = Vector2(197.3, 32.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Branch3" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1810.6499999999999, 808.0)
+size = Vector2(154.7, 32.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Branch4" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2288.0499999999997, 754.7)
+size = Vector2(138.7, 32.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="BranchTopL" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(680.0, 455.95)
+size = Vector2(560.0, 37.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="BranchTopR" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2133.35, 503.95)
+size = Vector2(853.3, 37.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank1" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(728.0, 786.7)
+size = Vector2(144.0, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank2" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(938.65, 786.7)
+size = Vector2(106.7, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank3" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1541.3, 786.7)
+size = Vector2(96.0, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank4" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1935.95, 1000.0)
+size = Vector2(117.3, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank5" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2069.35, 1000.0)
+size = Vector2(106.7, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank6" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1434.65, 637.3)
+size = Vector2(117.3, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank7" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(680.0500000000001, 530.7)
+size = Vector2(122.7, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank8" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1109.35, 434.7)
+size = Vector2(106.7, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="Plank9" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1920.05, 557.3)
+size = Vector2(106.7, 16.0)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepA1" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(720.0, 1002.65)
+size = Vector2(64.0, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepA2" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(784.0, 970.65)
+size = Vector2(64.0, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepA3" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(848.0, 938.65)
+size = Vector2(64.0, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepB1" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2162.65, 1002.65)
+size = Vector2(58.7, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepB2" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2221.35, 970.65)
+size = Vector2(58.7, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="StepB3" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2280.0499999999997, 938.65)
+size = Vector2(58.7, 21.3)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="BridgeTop" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1647.95, 805.35)
+size = Vector2(117.3, 10.7)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="BridgeRope" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(1061.35, 1021.35)
+size = Vector2(138.7, 10.7)
+one_way = true
+modulate = Color(1, 1, 1, 0)
+
+[node name="VineA" parent="." instance=ExtResource("6_climb")]
+position = Vector2(712.0, 642.7)
+size = Vector2(53.3, 272.0)
+visible_art = false
+
+[node name="VineB" parent="." instance=ExtResource("6_climb")]
+position = Vector2(946.7, 602.7)
+size = Vector2(53.3, 341.3)
+visible_art = false
+
+[node name="VineC" parent="." instance=ExtResource("6_climb")]
+position = Vector2(1474.7, 842.7)
+size = Vector2(53.3, 426.7)
+visible_art = false
+
+[node name="VineD" parent="." instance=ExtResource("6_climb")]
+position = Vector2(2237.3, 829.3)
+size = Vector2(53.3, 325.3)
+visible_art = false
+
+[node name="LadderA" parent="." instance=ExtResource("6_climb")]
+kind = 1
+position = Vector2(1208.0, 917.3)
+size = Vector2(53.3, 277.3)
+visible_art = false
+
+[node name="LadderB" parent="." instance=ExtResource("6_climb")]
+kind = 1
+position = Vector2(1816.0, 941.3)
+size = Vector2(53.3, 261.3)
+visible_art = false
+
+[node name="Spikes" parent="." instance=ExtResource("7_spike")]
+position = Vector2(1061.3, 1378.7)
+size = Vector2(128.0, 34.7)
+visible_art = false
+
+[node name="SpikesRight" parent="." instance=ExtResource("7_spike")]
+position = Vector2(1648.0, 1378.7)
+size = Vector2(106.7, 34.7)
+visible_art = false
+
+[node name="SwampFloor" parent="Terrain" instance=ExtResource("2_plat")]
+position = Vector2(2000.0, 1402.65)
+size = Vector2(266.7, 53.3)
+
+[node name="Water" parent="." instance=ExtResource("10_water")]
+position = Vector2(2000.0, 1253.3)
+size = Vector2(266.7, 245.3)
+
+[node name="Chest" parent="." instance=ExtResource("11_chest")]
+position = Vector2(2118, 1376)
+
+[node name="Extraction" parent="." instance=ExtResource("5_exit")]
+position = Vector2(2400.0, 485.3)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(160.0, 1045.3)
+camera_limits = Rect2(0, 0, 2560, 1440)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 18
+
+[node name="Scan" type="ColorRect" parent="Vignette"]
+material = SubResource("MatScan")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
