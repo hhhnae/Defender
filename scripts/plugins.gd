@@ -11,7 +11,7 @@ const PLUGIN_DATA := {
 	"plugin_time_boost": {
 		"name": "时域强化",
 		"sub": "TIME DOMAIN BOOST",
-		"desc": "把自身的时间流速往前推一格:动作更快,节奏更紧。",
+		"desc": "空格触发:60 秒内攻速 ×3、闪避无冷却,并且移动方式改为连续闪避。冷却 25 秒。",
 		"icon": "res://levels/ui/icons/icon_time_boost.png",
 	},
 }

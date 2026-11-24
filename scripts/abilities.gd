@@ -44,6 +44,24 @@ func _ready() -> void:
 	refresh()
 
 
+## 给整备终端用的说明:冷却 / 持续 / 按键
+func get_summary(id: String) -> String:
+	var def: Dictionary = DEFS.get(id, {})
+	if def.is_empty():
+		return ""
+	var parts := []
+	var cd := float(def.get("cooldown", 0.0))
+	if cd > 0.0:
+		parts.append("冷却 %d 秒" % int(round(cd)))
+	var dur := float(def.get("duration", 0.0))
+	if dur > 0.0:
+		parts.append("持续 %d 秒" % int(round(dur)))
+	var hint := String(def.get("hint", ""))
+	if not hint.is_empty():
+		parts.append("%s 触发" % hint)
+	return " · ".join(parts)
+
+
 func get_def(id: String) -> Dictionary:
 	return DEFS.get(id, {})
 

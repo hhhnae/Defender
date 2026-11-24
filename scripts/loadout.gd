@@ -21,7 +21,7 @@ const DEFAULT_STYLE := {
 	"name": "标准近战",
 	"kind": "style",
 	"tag": "平A",
-	"desc": "轻斩 / 重斩 / 突进斩,主角的基础攻击",
+	"desc": "J 轻斩(两段变化),K 重斩,L 突进斩。不消耗资源,是最稳的输出手段。",
 	"icon": "res://levels/ui/icons/style_basic_melee.png",
 }
 
@@ -32,7 +32,7 @@ const DEFAULT_SKILL := {
 	"name": "假死",
 	"kind": "skill",
 	"tag": "Q",
-	"desc": "装死，古老而有效的方法；一直保持到下一次攻击。冷却 10 秒。",
+	"desc": "Q 触发:原地倒地装死,期间免疫伤害,按任意攻击键起身。持续到下次攻击,冷却 10 秒。",
 	"icon": "res://levels/ui/icons/skill_feign.png",
 }
 

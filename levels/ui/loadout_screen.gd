@@ -130,10 +130,10 @@ func _refresh() -> void:
 
 	_slots_box.add_child(_section_label("技能插槽 / SLOTS"))
 	var ultimate_item: Dictionary = Loadout.get_slot(Loadout.KIND_ULTIMATE, 0)
-	_slots_box.add_child(_make_slot(Loadout.KIND_ULTIMATE, 0, "终极技能", ultimate_item, 92, C_VIOLET))
+	_slots_box.add_child(_make_slot(Loadout.KIND_ULTIMATE, 0, "终极技能", ultimate_item, 104, C_VIOLET))
 	for i in Loadout.SKILL_COUNT:
 		var item: Dictionary = Loadout.get_slot(Loadout.KIND_SKILL, i)
-		_slots_box.add_child(_make_slot(Loadout.KIND_SKILL, i, "技能槽 %d" % (i + 1), item, 64, C_CYAN))
+		_slots_box.add_child(_make_slot(Loadout.KIND_SKILL, i, "技能槽 %d" % (i + 1), item, 78, C_CYAN))
 
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)
@@ -141,7 +141,7 @@ func _refresh() -> void:
 	_slots_box.add_child(_section_label("战斗风格 / STYLES"))
 	for i in Loadout.STYLE_COUNT:
 		var item: Dictionary = Loadout.get_slot(Loadout.KIND_STYLE, i)
-		_slots_box.add_child(_make_slot(Loadout.KIND_STYLE, i, "风格槽 %d" % (i + 1), item, 64, C_AMBER))
+		_slots_box.add_child(_make_slot(Loadout.KIND_STYLE, i, "风格槽 %d" % (i + 1), item, 78, C_AMBER))
 
 	_refresh_owned()
 
@@ -285,6 +285,9 @@ func _make_slot(kind: String, index: int, slot_name: String, item: Dictionary,
 		desc.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		texts.add_child(desc)
+		var info := _summary_label(item)
+		if info != null:
+			texts.add_child(info)
 	elif selected:
 		var hint := Label.new()
 		hint.text = "已选中,点击右侧技能装备"
@@ -304,7 +307,7 @@ func _make_item_card(item: Dictionary) -> Control:
 	var bg := Color(0.03, 0.07, 0.11, 0.92) if not equipped else Color(0.02, 0.04, 0.07, 0.85)
 
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(430, 84)
+	btn.custom_minimum_size = Vector2(430, 96)
 	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	btn.focus_mode = Control.FOCUS_NONE
 	btn.add_theme_stylebox_override("normal", _box(bg, border))
@@ -350,6 +353,9 @@ func _make_item_card(item: Dictionary) -> Control:
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	texts.add_child(desc)
+	var info := _summary_label(item)
+	if info != null:
+		texts.add_child(info)
 
 	var tag := Label.new()
 	tag.text = "已装备" if equipped else _kind_short(String(item.get("kind", "")))
@@ -361,6 +367,23 @@ func _make_item_card(item: Dictionary) -> Control:
 	tag.add_theme_color_override("font_color", C_AMBER if equipped else C_CYAN_DIM)
 	row.add_child(tag)
 	return btn
+
+
+## 冷却 / 持续 / 按键 的小字说明(来自 Abilities 注册表)
+func _summary_label(item: Dictionary) -> Label:
+	var ab := get_node_or_null("/root/Abilities")
+	if ab == null:
+		return null
+	var summary: String = ab.call("get_summary", String(item.get("id", "")))
+	if summary.is_empty():
+		return null
+	var label := Label.new()
+	label.text = summary
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.add_theme_font_override("font", _font)
+	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_color_override("font_color", Color(0.5, 0.86, 0.95, 0.9))
+	return label
 
 
 func _section_label(text: String) -> Label:
@@ -423,10 +446,15 @@ func _build() -> void:
 	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	left.add_theme_constant_override("separation", 8)
 	body.add_child(left)
+	var left_scroll := ScrollContainer.new()
+	left_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left.add_child(left_scroll)
+
 	_slots_box = VBoxContainer.new()
-	_slots_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_slots_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_slots_box.add_theme_constant_override("separation", 8)
-	left.add_child(_slots_box)
+	left_scroll.add_child(_slots_box)
 
 	# 右:已有技能
 	var right := VBoxContainer.new()
